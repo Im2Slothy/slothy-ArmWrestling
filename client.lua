@@ -42,7 +42,7 @@ local aiPedHandle = nil
 -- Helper function for safe animation playback
 function PlaySafeAnim(ped, dict, anim, speedIn, speedOut, duration, flag)
     if not DoesEntityExist(ped) then
-        print("PlaySafeAnim: Entity does not exist")
+        --print("PlaySafeAnim: Entity does not exist")
         return false
     end
     
@@ -65,13 +65,13 @@ function PlaySafeAnim(ped, dict, anim, speedIn, speedOut, duration, flag)
         end
         
         if IsEntityPlayingAnim(ped, dict, anim, 3) then
-            print("Animation started successfully: " .. dict .. " - " .. anim)
+            --print("Animation started successfully: " .. dict .. " - " .. anim)
             return true
         else
-            print("Failed to start animation: " .. dict .. " - " .. anim)
+            --print("Failed to start animation: " .. dict .. " - " .. anim)
         end
     else
-        print("Failed to load animation dictionary: " .. dict)
+        --print("Failed to load animation dictionary: " .. dict)
     end
     
     return false
@@ -104,13 +104,13 @@ Citizen.CreateThread(function()
         while not HasAnimDictLoaded(dict) do
             Citizen.Wait(10)
         end
-        print("Loaded animation dictionary: " .. dict)
+        --print("Loaded animation dictionary: " .. dict)
     end
     RequestAnimDict("amb@world_human_push_ups@male@base")
     while not HasAnimDictLoaded("amb@world_human_push_ups@male@base") do
         Citizen.Wait(10)
     end
-    print("Loaded push-up dictionary")
+    --print("Loaded push-up dictionary")
 end)
 
 -- Target setup for qb-target
@@ -257,12 +257,12 @@ AddEventHandler("qb-armwrestling:waitForPlayer", function(data)
     --FreezeEntityPosition(PlayerPedId(), true)
     
     TaskPlayAnim(PlayerPedId(), animDicts['enter'], animNames['enterWaiting'], 8.0, -8.0, -1, 1, 0, false, false, false)
-    print("Player waiting animation: " .. animDicts['enter'] .. " - " .. animNames['enterWaiting'])
+    --print("Player waiting animation: " .. animDicts['enter'] .. " - " .. animNames['enterWaiting'])
     
     Citizen.Wait(5000)
     if waitingForOpponent then
         TaskPlayAnim(PlayerPedId(), animDicts['idle'], animNames['idleWaiting'], 8.0, -8.0, -1, 1, 0, false, false, false)
-        print("Player idle waiting animation: " .. animDicts['idle'] .. " - " .. animNames['idleWaiting'])
+        --print("Player idle waiting animation: " .. animDicts['idle'] .. " - " .. animNames['idleWaiting'])
     end
 end)
 
@@ -287,7 +287,7 @@ AddEventHandler("qb-armwrestling:challengeAI", function(data)
     SpawnAIOpponent(entity, propCoords, propHeading)
     
     -- Removed early TaskPlayAnim and countdown
-    print("Player enter animation and countdown deferred to StartArmWrestlingGameVsAI")
+    --print("Player enter animation and countdown deferred to StartArmWrestlingGameVsAI")
     
     -- Removed countdown notifications and wait
     StartArmWrestlingGameVsAI()
@@ -307,9 +307,9 @@ function SpawnAIOpponent(entity, propCoords, propHeading)
         SetBlockingOfNonTemporaryEvents(aiPedHandle, true)
         FreezeEntityPosition(aiPedHandle, true)
 
-        print("AI opponent spawned at: " .. propCoords.x .. ", " .. propCoords.y + 0.6 .. ", " .. propCoords.z - 0.5)
+        --print("AI opponent spawned at: " .. propCoords.x .. ", " .. propCoords.y + 0.6 .. ", " .. propCoords.z - 0.5)
     else
-        print("Failed to create AI opponent.")
+        --print("Failed to create AI opponent.")
     end
 end
 
@@ -439,7 +439,7 @@ end)
 function StartArmWrestlingGameVsAI()
     if isWrestling and not positioningInProgress then
         positioningInProgress = true
-        print("Starting arm wrestling game vs AI")
+        --print("Starting arm wrestling game vs AI")
 
         -- Ensure the player and AI are in position
         local prop = GetClosestObjectOfType(GetEntityCoords(PlayerPedId()), 1.5, GetHashKey('prop_arm_wrestle_01'), 0, 0, 0)
@@ -460,12 +460,12 @@ function StartArmWrestlingGameVsAI()
             Citizen.Wait(100)
         end
         if not DoesEntityExist(aiPedHandle) then
-            print("AI failed to spawn properly. Aborting match.")
+            --print("AI failed to spawn properly. Aborting match.")
             EndArmWrestling("cancel")
             positioningInProgress = false
             return
         end
-        print("AI spawn confirmed.")
+        --print("AI spawn confirmed.")
 
         -- Freeze positions immediately to prevent drift
         FreezeEntityPosition(playerPed, true)
@@ -474,18 +474,18 @@ function StartArmWrestlingGameVsAI()
         end
 
         -- Start with intro animations and keep them throughout the countdown
-        print("Starting intro animations")
+        --print("Starting intro animations")
         PlaySafeAnim(playerPed, animDicts['enter'], animNames['enter'], 8.0, -8.0, -1, 2, 0)
         if aiPedHandle then
             PlaySafeAnim(aiPedHandle, animDicts['enter'], 'aw_ig_intro_alt1_b', 8.0, -8.0, -1, 2, 0)
         end
-        print("Intro animations started")
+        --print("Intro animations started")
 
         -- Allow time for intro animations to sync but don't end them
         Citizen.Wait(3000)
 
         -- Start countdown while still in intro animation
-        print("Starting countdown")
+        --print("Starting countdown")
         QBCore.Functions.Notify("Get ready...", "warning")
         Citizen.Wait(1000)
         QBCore.Functions.Notify("3...", "warning")
@@ -497,12 +497,12 @@ function StartArmWrestlingGameVsAI()
         QBCore.Functions.Notify("GO! Rapidly press A and D to win!", "success")
 
         -- Now transition directly to struggle animations
-        print("Starting struggle phase")
+        --print("Starting struggle phase")
         PlaySafeAnim(playerPed, animDicts['playing'], animNames['playing'], 8.0, -8.0, -1, 2, 0)
         if aiPedHandle then
             PlaySafeAnim(aiPedHandle, animDicts['playing'], 'sweep_b', 8.0, -8.0, -1, 2, 0)
         end
-        print("Struggle animations started")
+        --print("Struggle animations started")
 
         playerStrength = 0
         currentPosition = 50
@@ -512,9 +512,9 @@ function StartArmWrestlingGameVsAI()
         local aiPushFrequency = 0
         local aiRandomVariance = 0
         if aiDifficulty == 1 then
-            aiPushStrength = 0.45
-            aiPushFrequency = 400
-            aiRandomVariance = 0.02
+            aiPushStrength = 0.45 -- This determines how much the AI pushes on the bar
+            aiPushFrequency = 400 -- This determines how often the AI pushes in ms
+            aiRandomVariance = 0.02 -- This determines how much the AI's push strength can vary
         elseif aiDifficulty == 2 then
             aiPushStrength = 0.6
             aiPushFrequency = 350
@@ -536,13 +536,13 @@ function StartArmWrestlingGameVsAI()
                     local aiPush = aiPushStrength + variance
                     currentPosition = currentPosition - aiPush
                     lastAiPush = GetGameTimer()
-                    print("AI Push: " .. aiPush .. " | New Position: " .. currentPosition)
+                    --print("AI Push: " .. aiPush .. " | New Position: " .. currentPosition)
                 end
                 if IsControlPressed(0, 34) or IsControlPressed(0, 35) then
                     if GetGameTimer() - lastInputTime >= inputCooldown then
                         currentPosition = currentPosition + 0.15
                         lastInputTime = GetGameTimer()
-                        print("Player Push: 0.15 | New Position: " .. currentPosition)
+                        --print("Player Push: 0.15 | New Position: " .. currentPosition)
                     end
                 end
                 currentPosition = math.max(0, math.min(100, currentPosition))
@@ -553,7 +553,7 @@ function StartArmWrestlingGameVsAI()
                 if aiPedHandle and IsEntityPlayingAnim(aiPedHandle, animDicts['playing'], 'sweep_b', 3) then
                     SetEntityAnimCurrentTime(aiPedHandle, animDicts['playing'], 'sweep_b', animGrade)
                 end
-                print("Anim Sync | Position: " .. currentPosition .. " | Anim Grade: " .. animGrade)
+                --print("Anim Sync | Position: " .. currentPosition .. " | Anim Grade: " .. animGrade)
             end
             if currentPosition <= loseThreshold then
                 EndArmWrestling("lose")
